@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="pt-PT">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pina Automóveis — Histórico de Veículos</title>
+<style>
+:root{--bg:#0f1724;--muted:#9aa6b2;--accent:#3b82f6;--accent2:#6ee7b7;--text:#e6eef6;--max:1100px}
+*{box-sizing:border-box}
+body{margin:0;background:linear-gradient(180deg,#071026,#0f1724);color:var(--text);font-family:system-ui,Arial;padding:28px;display:flex;justify-content:center}
+.wrap{max-width:var(--max);width:100%}
+header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.logo{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--accent2),var(--accent));display:grid;place-items:center;font-weight:800;color:#062022}
+nav a{color:var(--muted);text-decoration:none;margin-left:12px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.card{background:rgba(255,255,255,.03);border-radius:12px;overflow:hidden}
+.card img{width:100%;height:160px;object-fit:cover}
+.card-body{padding:14px}
+.title-row{display:flex;justify-content:space-between}
+.badge{background:rgba(255,255,255,.08);padding:4px 8px;border-radius:8px;font-size:.8rem}
+.specs{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0;color:var(--muted);font-size:.9rem}
+.spec{background:rgba(255,255,255,.04);padding:4px 6px;border-radius:6px}
+.card-thumbs{display:flex;gap:6px;margin-top:8px}
+.card-thumbs img{width:76px;height:46px;object-fit:cover;border-radius:6px;cursor:pointer;border:2px solid transparent}
+.price{color:var(--accent2);font-weight:800}
+.actions{display:flex;gap:8px;margin-top:8px}
+.btn{padding:6px 10px;border-radius:8px;border:0;cursor:pointer;font-weight:700}
+.btn-primary{background:var(--accent);color:white}
+.btn-ghost{background:transparent;border:1px solid rgba(255,255,255,.2);color:var(--text)}
+.quick-info{display:none;background:rgba(255,255,255,.03);padding:10px;border-radius:8px;margin-top:10px;color:var(--muted)}
+footer{text-align:center;margin-top:20px;color:var(--muted)}
+.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;padding:20px}
+.modal{background:#071427;border-radius:12px;padding:18px;max-width:900px;width:100%;max-height:90vh;overflow:auto}
+.modal img{width:100%;border-radius:8px}
+.modal .row{display:flex;gap:16px}
+.modal .info{flex:1}
+.close{background:transparent;border:0;color:var(--muted);cursor:pointer;font-size:18px}
+.modal-gallery{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.modal-gallery img{width:86px;height:56px;object-fit:cover;border-radius:6px;cursor:pointer;border:2px solid transparent}
+.history-list{margin:8px 0;padding-left:16px;color:var(--muted)}
+.history-item{background:rgba(255,255,255,.02);padding:8px;border-radius:8px;margin-bottom:8px}
+@media(max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}.modal .row{flex-direction:column}}
+@media(max-width:600px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<div style="display:flex;gap:12px;align-items:center"><div class="logo">PA</div><div><h1>Pina Automóveis</h1><div style="color:var(--muted);font-size:.9rem">Compra | Vende | Confia</div></div></div>
+<nav><a href="#carros">Carros</a><a href="#contacto">Contacto</a></nav>
+</header>
+<main>
+<h2 id="carros">Catálogo</h2>
+<div class="grid" id="carsGrid"></div>
+</main>
+<div id="contacto" style="margin-top:20px"><h3>Contacto</h3><p style="color:var(--muted)">Email: vendas@pinaautomoveis.pt • Telefone: +351 900 000 000 • Site: <a href="https://www.pinaautomoveis.pt" target="_blank" rel="noopener noreferrer" style="color:var(--accent2)">www.pinaautomoveis.pt</a></p></div>
+<footer>© 2026 Pina Automóveis</footer>
+</div>
+<div class="modal-backdrop" id="modal">
+<div class="modal">
+<div style="display:flex;justify-content:space-between;align-items:center"><strong id="modalTitle"></strong><button class="close" id="modalClose">✕</button></div>
+<div class="row">
+<div style="flex:1"><img id="modalImg" alt="foto"></div>
+<div class="info">
+<p id="modalDesc" style="color:var(--muted)"></p>
+<ul id="modalSpecs" style="color:var(--muted);margin:10px 0;padding-left:18px"></ul>
+<div id="modalHistory"></div>
+<div class="modal-gallery" id="modalGallery"></div>
+<div style="display:flex;gap:8px;margin-top:12px"><button class="btn btn-primary" id="modalContact">Contactar vendedor</button><button class="btn btn-ghost" id="modalExport">Exportar histórico</button><button class="btn btn-ghost" id="modalClose2">Fechar</button></div>
+</div>
+</div>
+</div>
+</div>
+<script>
+const carsData={
+"bmw-3":{
+id:"bmw-3",
+title:"BMW Série 3",
+price:"€32.000",
+images:["1773581977763.jpg","1773581977788.jpg","1773581977775.jpg","1773581977753.jpg","1773581977798.jpg","1773581977769.jpg","1773581977783.jpg","1773581977738.jpg","1773581977746.jpg","1773581977803.jpg"],
+mainImg:"1773581977763.jpg",
+desc:"BMW Série 3 com manutenção completa e histórico documentado.",
+specs:["Ano: 2020","Km: 42.000","Combustível: Gasolina","Transmissão: Automático","Potência: 190 cv","Motor: 2.0 Turbo"],
+quick:{km:"42.000 km",fuel:"Gasolina",consumption:"6.8 L/100km",transmission:"Automático"},
+history:{produced:"2019-11-12",first_purchase:"2020-01-25",purchased_by_pina:"2026-02-20",previous_owners:2,owners:[{owner:"Primeiro dono",from:"2020-01-25",to:"2022-03-10",notes:"Uso diário"},{owner:"Segundo dono",from:"2022-03-15",to:"2026-02-10",notes:"Revisões regulares"}],repairs:[{date:"2022-11-04",item:"Troca de pastilhas de travão",cost:"€120",notes:"Frente - desgaste"},{date:"2024-05-20",item:"Substituição de bateria",cost:"€180",notes:"Bateria falhou"},{date:"2025-06-10",item:"Revisão completa",cost:"€320",notes:"Óleo, filtros e inspeção"}]}
+},
+"audi-a4":{
+id:"audi-a4",
+title:"Audi A4",
+price:"€28.500",
+images:[
+"https://upload.wikimedia.org/wikipedia/commons/4/44/2016_Audi_A4_Sport_TDi_S-A_2.0_Front.jpg",
+"https://upload.wikimedia.org/wikipedia/commons/a/a9/Audi_A4_B9_Interior.jpg",
+"https://upload.wikimedia.org/wikipedia/commons/e/e6/2016_Audi_A4_Sport_TDi_S-A_2.0_Rear.jpg"
+],
+mainImg:"https://upload.wikimedia.org/wikipedia/commons/4/44/2016_Audi_A4_Sport_TDi_S-A_2.0_Front.jpg",
+desc:"Audi A4 económico, histórico de manutenção disponível.",
+specs:["Ano: 2019","Km: 58.200","Combustível: Diesel","Transmissão: Manual","Potência: 150 cv"],
+quick:{km:"58.200 km",fuel:"Diesel",consumption:"4.9 L/100km",transmission:"Manual"},
+history:{produced:"2018-06-05",first_purchase:"2018-09-12",purchased_by_pina:"2026-01-15",previous_owners:3,owners:[{owner:"Duarte Silva",from:"2018-09-12",to:"2019-12-01",notes:"Particular"},{owner:"Empresa/Leasing",from:"2020-01-10",to:"2021-08-23",notes:"Frota"},{owner:"Catarina Lopes",from:"2021-09-01",to:"2026-01-10",notes:"Particular"}],repairs:[{date:"2019-11-10",item:"Troca de pneus",cost:"€400",notes:"Conjunto dianteiro"},{date:"2022-04-02",item:"Verificação da correia",cost:"€0",notes:"Sem substituição"},{date:"2023-10-14",item:"Limpeza de injetores",cost:"€150",notes:"Melhoria do consumo"}]}
+},
+"merc-c":{
+id:"merc-c",
+title:"Mercedes C-Class",
+price:"€35.900",
+mainImg:"https://upload.wikimedia.org/wikipedia/commons/5/57/Mercedes_Benz_C_Class.jpg",
+desc:"Mercedes C-Class com interior premium e baixa quilometragem.",
+specs:["Ano: 2021","Km: 18.400","Combustível: Gasolina","Transmissão: Automático","Potência: 220 cv"],
+quick:{km:"18.400 km",fuel:"Gasolina",consumption:"7.2 L/100km",transmission:"Automático"},
+history:{produced:"2020-02-20",first_purchase:"2020-04-05",purchased_by_pina:"2026-03-02",previous_owners:1,owners:[{owner:"João Marques",from:"2020-04-05",to:"2026-02-20",notes:"Único dono"}],repairs:[{date:"2021-07-22",item:"Manutenção (óleo e filtros)",cost:"€180",notes:"Manutenção periódica"},{date:"2024-03-11",item:"Pastilhas traseiras",cost:"€140",notes:"Desgaste"}]}
+}
+};
+
+function buildGrid(){
+const grid=document.getElementById("carsGrid");
+grid.innerHTML="";
+Object.keys(carsData).forEach(key=>{
+const c=carsData[key];
+const art=document.createElement("article");
+art.className="card";
+art.dataset.make=c.title.split(" ")[0];
+art.dataset.trans=c.quick.transmission||"";
+art.dataset.price=c.price.replace(/[^0-9]/g,"");
+art.dataset.id=c.id;
+art.innerHTML='<img src="'+c.mainImg+'" alt="'+c.title+'">'+
+'<div class="card-body">'+
+'<div class="title-row"><h3>'+c.title+'</h3><span class="badge">Em stock</span></div>'+
+'<div class="specs">'+c.specs.map(s=>'<div class="spec">'+s+'</div>').join('')+'</div>'+
+'<div class="card-thumbs" id="thumbs-'+c.id+'"></div>'+
+'<div class="quick-info" id="quick-'+c.id+'"></div>'+
+'<div style="display:flex;justify-content:space-between;align-items:center"><span class="price">'+c.price+'</span>'+
+'<div class="actions">'+
+'<button class="btn btn-primary" onclick="openModal(\''+c.id+'\')">Ver detalhes</button>'+
+'<button class="btn btn-ghost" onclick="toggleQuick(\''+c.id+'\')">Informações</button>'+
+'<button class="btn btn-ghost" onclick="contactSeller(\''+c.title+'\')">Contactar</button>'+
+'</div></div></div>';
+
+grid.appendChild(art);
+});
+
+Object.keys(carsData).forEach(key=>{
+const c=carsData[key];
+if(!c.images||!c.images.length)return;
+const thumbs=document.getElementById("thumbs-"+c.id);
+const cardImg=document.querySelector('[data-id="'+c.id+'"] img');
+if(!thumbs||!cardImg)return;
+
+c.images.forEach((src,idx)=>{
+const t=document.createElement("img");
+t.src=src;
+t.alt=c.title+" foto "+(idx+1);
+if(idx===0)t.style.border="2px solid var(--accent2)";
+t.onclick=()=>{
+cardImg.src=src;
+Array.from(thumbs.children).forEach(ch=>ch.style.border="2px solid transparent");
+t.style.border="2px solid var(--accent2)";
+};
+thumbs.appendChild(t);
+});
+});
+}
+
+function openModal(id){
+const c=carsData[id];
+if(!c)return;
+
+document.getElementById("modalTitle").textContent=c.title+" — "+c.price;
+
+const main=c.images&&c.images.length?c.images[0]:c.mainImg;
+document.getElementById("modalImg").src=main;
+
+document.getElementById("modalDesc").textContent=c.desc;
+
+const ul=document.getElementById("modalSpecs");
+ul.innerHTML="";
+c.specs.forEach(s=>{
+const li=document.createElement("li");
+li.textContent=s;
+ul.appendChild(li);
+});
+
+const mh=document.getElementById("modalHistory");
+mh.innerHTML="";
+
+const htop=document.createElement("div");
+htop.className="history-item";
+htop.innerHTML="<strong>Produzido:</strong> "+c.history.produced+"<br><strong>Primeira compra:</strong> "+c.history.first_purchase+"<br><strong>Comprado pela Pina Automóveis:</strong> "+c.history.purchased_by_pina+"<br><strong>Proprietários anteriores:</strong> "+c.history.previous_owners;
+mh.appendChild(htop);
+
+const ownersList=document.createElement("div");
+ownersList.className="history-list";
+
+c.history.owners.forEach(o=>{
+const el=document.createElement("div");
+el.className="history-item";
+el.innerHTML="<strong>"+o.owner+"</strong> — "+o.from+" até "+o.to+"<br><small style='color:var(--muted)'>"+o.notes+"</small>";
+ownersList.appendChild(el);
+});
+
+mh.appendChild(ownersList);
+
+const repList=document.createElement("div");
+repList.className="history-list";
+
+c.history.repairs.forEach(r=>{
+const el=document.createElement("div");
+el.className="history-item";
+el.innerHTML="<strong>"+r.date+"</strong> — "+r.item+" ("+r.cost+")<br><small style='color:var(--muted)'>"+r.notes+"</small>";
+repList.appendChild(el);
+});
+
+mh.appendChild(repList);
+
+const gallery=document.getElementById("modalGallery");
+gallery.innerHTML="";
+
+if(c.images&&c.images.length){
+c.images.forEach((src,idx)=>{
+const t=document.createElement("img");
+t.src=src;
+t.alt=c.title+" foto "+(idx+1);
+if(idx===0)t.style.border="2px solid var(--accent2)";
+t.onclick=()=>{
+document.getElementById("modalImg").src=src;
+Array.from(gallery.children).forEach(ch=>ch.style.border="2px solid transparent");
+t.style.border="2px solid var(--accent2)";
+};
+gallery.appendChild(t);
+});
+}
+
+document.getElementById("modalContact").onclick=function(){contactSeller(c.title)};
+document.getElementById("modalExport").onclick=function(){exportHistory(c.id)};
+
+document.getElementById("modal").style.display="flex";
+}
+
+function closeModal(){
+document.getElementById("modal").style.display="none";
+}
+
+function toggleQuick(id){
+const el=document.getElementById("quick-"+id);
+const c=carsData[id];
+if(!el||!c)return;
+const open=el.style.display==="block";
+
+document.querySelectorAll(".quick-info").forEach(q=>q.style.display="none");
+
+if(!open){
+el.textContent=c.quick.km+" | "+c.quick.fuel+" | "+c.quick.consumption+" | "+c.quick.transmission;
+el.style.display="block";
+}
+}
+
+function contactSeller(model){
+const name=prompt("Nome:");
+if(!name)return;
+const phone=prompt("Telefone ou email:");
+if(!phone)return;
+alert("Obrigado, "+name+"! Recebemos o pedido para "+model);
+}
+
+function exportHistory(id){
+const c=carsData[id];
+if(!c||!c.history){alert("Histórico indisponível");return}
+
+let text="";
+text+="Histórico do veículo - "+c.title+"\n";
+text+="Preço pedido: "+c.price+"\n";
+text+="Produzido: "+c.history.produced+"\n";
+text+="Primeira compra: "+c.history.first_purchase+"\n";
+text+="Comprado pela Pina Automóveis: "+c.history.purchased_by_pina+"\n";
+text+="Proprietários anteriores: "+c.history.previous_owners+"\n\n";
+
+text+="Proprietários (linha do tempo):\n";
+
+c.history.owners.forEach(o=>{
+text+="- "+o.owner+": "+o.from+" até "+o.to+" — "+o.notes+"\n";
+});
+
+text+="\nIntervenções / Reparações:\n";
+
+c.history.repairs.forEach(r=>{
+text+="- "+r.date+": "+r.item+" ("+r.cost+") — "+r.notes+"\n";
+});
+
+const blob=new Blob([text],{type:"text/plain"});
+const url=URL.createObjectURL(blob);
+
+const a=document.createElement("a");
+a.href=url;
+a.download=c.title.split(" ").join("_")+"_historico.txt";
+
+document.body.appendChild(a);
+a.click();
+
+URL.revokeObjectURL(url);
+a.remove();
+}
+
+document.getElementById("modalClose").onclick=closeModal;
+document.getElementById("modalClose2").onclick=closeModal;
+
+buildGrid();
+
+document.addEventListener("keydown",function(e){
+if(e.key==="Escape")closeModal();
+});
+</script>
+</body>
+</html>
