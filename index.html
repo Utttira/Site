@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="pt">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Casino Demo - Roleta</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="container">
+      <h1>🎲 Casino Demo: Roleta</h1>
+      <p class="subtitle">Projeto educativo (sem dinheiro real).</p>
+
+      <section class="card">
+        <p><strong>Saldo:</strong> <span id="balance">1000</span> créditos</p>
+        <p><strong>Seed da sessão:</strong> <code id="seed"></code></p>
+      </section>
+
+      <section class="card">
+        <h2>Fazer Aposta</h2>
+        <form id="bet-form">
+          <label>
+            Valor
+            <input id="amount" type="number" min="1" value="10" required />
+          </label>
+
+          <label>
+            Cor
+            <select id="color">
+              <option value="red">Vermelho (2x)</option>
+              <option value="black">Preto (2x)</option>
+              <option value="green">Verde (14x)</option>
+            </select>
+          </label>
+
+          <button type="submit">Girar roleta</button>
+          <button id="reset" type="button" class="secondary">Reset saldo</button>
+        </form>
+      </section>
+
+      <section class="card">
+        <h2>Último Resultado</h2>
+        <p id="result">Nenhuma jogada ainda.</p>
+      </section>
+
+      <section class="card">
+        <h2>Histórico</h2>
+        <ul id="history"></ul>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
