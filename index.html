@@ -3,48 +3,81 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Casino Demo - Roleta</title>
+    <title>Casino Demo - Multi Jogos</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
     <main class="container">
-      <h1>🎲 Casino Demo: Roleta</h1>
-      <p class="subtitle">Projeto educativo (sem dinheiro real).</p>
+      <header class="hero card">
+        <h1>🎰 Casino Demo</h1>
+        <p class="subtitle">Projeto educativo (sem dinheiro real)</p>
+        <div class="stats">
+          <div><strong>Saldo:</strong> <span id="balance">1000</span> créditos</div>
+          <div><strong>Seed da sessão:</strong> <code id="seed"></code></div>
+        </div>
+      </header>
 
-      <section class="card">
-        <p><strong>Saldo:</strong> <span id="balance">1000</span> créditos</p>
-        <p><strong>Seed da sessão:</strong> <code id="seed"></code></p>
-      </section>
+      <nav class="tabs card" aria-label="Jogos disponíveis">
+        <button class="tab active" data-game="roulette">🎲 Roleta</button>
+        <button class="tab" data-game="slots">🎰 Slots</button>
+        <button class="tab" data-game="coinflip">🪙 Cara ou Coroa</button>
+      </nav>
 
-      <section class="card">
-        <h2>Fazer Aposta</h2>
-        <form id="bet-form">
-          <label>
-            Valor
-            <input id="amount" type="number" min="1" value="10" required />
+      <section id="game-roulette" class="card game-panel active">
+        <h2>Roleta</h2>
+        <form id="roulette-form" class="game-form">
+          <label>Valor
+            <input id="roulette-amount" type="number" min="1" value="10" required />
           </label>
-
-          <label>
-            Cor
-            <select id="color">
+          <label>Cor
+            <select id="roulette-color">
               <option value="red">Vermelho (2x)</option>
               <option value="black">Preto (2x)</option>
               <option value="green">Verde (14x)</option>
             </select>
           </label>
+          <button type="submit">Girar Roleta</button>
+        </form>
+      </section>
 
-          <button type="submit">Girar roleta</button>
-          <button id="reset" type="button" class="secondary">Reset saldo</button>
+      <section id="game-slots" class="card game-panel">
+        <h2>Slots</h2>
+        <form id="slots-form" class="game-form">
+          <label>Valor
+            <input id="slots-amount" type="number" min="1" value="10" required />
+          </label>
+          <button type="submit">Rodar Slots</button>
+        </form>
+        <p class="slot-view" id="slots-view">🍒 | 🍋 | ⭐</p>
+        <p class="hint">3 iguais: 8x · 2 iguais: 2x · nenhum: 0x</p>
+      </section>
+
+      <section id="game-coinflip" class="card game-panel">
+        <h2>Cara ou Coroa</h2>
+        <form id="coin-form" class="game-form">
+          <label>Valor
+            <input id="coin-amount" type="number" min="1" value="10" required />
+          </label>
+          <label>Lado
+            <select id="coin-side">
+              <option value="heads">Cara (2x)</option>
+              <option value="tails">Coroa (2x)</option>
+            </select>
+          </label>
+          <button type="submit">Lançar moeda</button>
         </form>
       </section>
 
       <section class="card">
-        <h2>Último Resultado</h2>
-        <p id="result">Nenhuma jogada ainda.</p>
+        <h2>Resultado</h2>
+        <p id="result">Escolhe um jogo para começar.</p>
       </section>
 
       <section class="card">
-        <h2>Histórico</h2>
+        <div class="history-header">
+          <h2>Histórico</h2>
+          <button id="reset" type="button" class="secondary">Reset saldo</button>
+        </div>
         <ul id="history"></ul>
       </section>
     </main>

@@ -9,10 +9,21 @@ const balanceEl = document.getElementById("balance");
 const seedEl = document.getElementById("seed");
 const resultEl = document.getElementById("result");
 const historyEl = document.getElementById("history");
-const form = document.getElementById("bet-form");
-const amountEl = document.getElementById("amount");
-const colorEl = document.getElementById("color");
 const resetBtn = document.getElementById("reset");
+const tabs = document.querySelectorAll(".tab");
+const panels = document.querySelectorAll(".game-panel");
+const slotsView = document.getElementById("slots-view");
+
+const rouletteForm = document.getElementById("roulette-form");
+const rouletteAmountEl = document.getElementById("roulette-amount");
+const rouletteColorEl = document.getElementById("roulette-color");
+
+const slotsForm = document.getElementById("slots-form");
+const slotsAmountEl = document.getElementById("slots-amount");
+
+const coinForm = document.getElementById("coin-form");
+const coinAmountEl = document.getElementById("coin-amount");
+const coinSideEl = document.getElementById("coin-side");
 
 seedEl.textContent = seed;
 render();
@@ -26,21 +37,27 @@ function rand01FromSeed() {
   return hash / 2 ** 32;
 }
 
-function spinRoulette() {
-  const r = rand01FromSeed();
-  if (r < 1 / 37) return "green";
-  return r < 0.5 ? "red" : "black";
+function debit(amount) {
+  if (!Number.isFinite(amount) || amount <= 0) return "Valor inválido.";
+  if (amount > balance) return "Saldo insuficiente.";
+  balance -= amount;
+  return null;
 }
 
-function payoutMultiplier(color) {
-  if (color === "green") return 14;
-  return 2;
+function credit(multiplier, amount) {
+  return amount * multiplier;
+}
+
+function pushResult(game, text) {
+  const msg = `[${game}] ${text}`;
+  history.push(msg);
+  resultEl.textContent = msg;
+  render();
 }
 
 function render() {
   balanceEl.textContent = balance.toString();
   historyEl.innerHTML = "";
-
   for (const item of [...history].reverse()) {
     const li = document.createElement("li");
     li.textContent = item;
@@ -48,42 +65,105 @@ function render() {
   }
 }
 
-form.addEventListener("submit", (e) => {
+function spinRoulette() {
+  const r = rand01FromSeed();
+  if (r < 1 / 37) return "green";
+  return r < 0.5 ? "red" : "black";
+}
+
+rouletteForm.addEventListener("submit", (e) => {
   e.preventDefault();
+  const amount = Number(rouletteAmountEl.value);
+  const choice = rouletteColorEl.value;
 
-  const amount = Number(amountEl.value);
-  const choice = colorEl.value;
-
-  if (!Number.isFinite(amount) || amount <= 0) {
-    resultEl.textContent = "Valor inválido.";
-    return;
-  }
-
-  if (amount > balance) {
-    resultEl.textContent = "Saldo insuficiente.";
+  const error = debit(amount);
+  if (error) {
+    resultEl.textContent = error;
     return;
   }
 
   const result = spinRoulette();
-  balance -= amount;
-
   let delta = -amount;
-  if (choice === result) {
-    const win = amount * payoutMultiplier(choice);
+
+  if (result === choice) {
+    const multiplier = choice === "green" ? 14 : 2;
+    const win = credit(multiplier, amount);
     balance += win;
     delta = win - amount;
   }
 
-  const text = `Aposta ${amount} em ${choice}, saiu ${result}, variação ${delta >= 0 ? "+" : ""}${delta}.`;
-  history.push(text);
-  resultEl.textContent = text;
+  pushResult("Roleta", `apostou ${amount} em ${choice}, saiu ${result}, variação ${delta >= 0 ? "+" : ""}${delta}.`);
+});
 
-  render();
+const slotSymbols = ["🍒", "🍋", "⭐", "🔔", "7️⃣"];
+function rollSlot() {
+  return slotSymbols[Math.floor(rand01FromSeed() * slotSymbols.length)];
+}
+
+slotsForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const amount = Number(slotsAmountEl.value);
+  const error = debit(amount);
+  if (error) {
+    resultEl.textContent = error;
+    return;
+  }
+
+  const a = rollSlot();
+  const b = rollSlot();
+  const c = rollSlot();
+  slotsView.textContent = `${a} | ${b} | ${c}`;
+
+  let multiplier = 0;
+  if (a === b && b === c) multiplier = 8;
+  else if (a === b || b === c || a === c) multiplier = 2;
+
+  let delta = -amount;
+  if (multiplier > 0) {
+    const win = credit(multiplier, amount);
+    balance += win;
+    delta = win - amount;
+  }
+
+  pushResult("Slots", `${a}|${b}|${c}, multiplicador ${multiplier}x, variação ${delta >= 0 ? "+" : ""}${delta}.`);
+});
+
+coinForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const amount = Number(coinAmountEl.value);
+  const choice = coinSideEl.value;
+
+  const error = debit(amount);
+  if (error) {
+    resultEl.textContent = error;
+    return;
+  }
+
+  const result = rand01FromSeed() < 0.5 ? "heads" : "tails";
+  let delta = -amount;
+  if (result === choice) {
+    const win = credit(2, amount);
+    balance += win;
+    delta = win - amount;
+  }
+
+  pushResult("Moeda", `apostou ${amount} em ${choice}, saiu ${result}, variação ${delta >= 0 ? "+" : ""}${delta}.`);
+});
+
+tabs.forEach((tab) => {
+  tab.addEventListener("click", () => {
+    const target = tab.dataset.game;
+    tabs.forEach((t) => t.classList.remove("active"));
+    panels.forEach((p) => p.classList.remove("active"));
+    tab.classList.add("active");
+    document.getElementById(`game-${target}`).classList.add("active");
+  });
 });
 
 resetBtn.addEventListener("click", () => {
   balance = INITIAL_BALANCE;
   history.length = 0;
   resultEl.textContent = "Saldo e histórico resetados.";
+  slotsView.textContent = "🍒 | 🍋 | ⭐";
   render();
 });

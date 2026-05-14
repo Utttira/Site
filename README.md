@@ -1,33 +1,28 @@
 # Casino Demo (Sem Dinheiro Real)
 
-Este projeto é um **casino demo** para fins educativos, sem pagamentos e sem dinheiro real.
+Projeto educativo de casino demo com múltiplos jogos e saldo virtual.
 
-## Conteúdo
+## Jogos incluídos
 
-- `index.html`: interface de roleta simples.
-- `app.js`: lógica do jogo, saldo virtual, histórico e transparência de seed.
-- `styles.css`: estilos base.
+- 🎲 **Roleta** (vermelho/preto/verde)
+- 🎰 **Slots** (símbolos com multiplicadores)
+- 🪙 **Cara ou Coroa**
 
 ## Como executar
-
-Como é um projeto estático, basta abrir o `index.html` no navegador.
-
-Ou servir localmente:
 
 ```bash
 python3 -m http.server 8000
 ```
 
-Depois aceda a `http://localhost:8000`.
+Abra `http://localhost:8000` no navegador.
 
-## Funcionalidades
+## Regras resumidas
 
-- Saldo virtual inicial: 1000 créditos
-- Aposta em vermelho/preto/verde
-- Resultado pseudoaleatório com seed da sessão
-- Histórico das jogadas
-- Botão de reset do saldo
+- Saldo inicial: **1000 créditos**
+- Roleta: vermelho/preto pagam 2x, verde paga 14x
+- Slots: 3 iguais pagam 8x, 2 iguais pagam 2x
+- Moeda: acerto paga 2x
 
 ## Aviso
 
-Não use este código para operar jogo a dinheiro real sem licenças, auditoria de RNG e conformidade legal.
+Sem dinheiro real. Não use em produção sem licenciamento, auditoria de RNG e conformidade legal.
